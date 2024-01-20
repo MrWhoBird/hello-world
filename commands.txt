@@ -1,0 +1,66 @@
+ec2-jenkins-server setup:
+- jenkins.sh
+- configure jenkins, git, maven tool
+- install publish over ssh
+
+
+ec2-docker-server setup:
+- docker.sh
+- create dockeradmin and ansadmin
+- visudo -> add to sudoers
+- vi /etc/ssh/sshd_config -> enable password
+- service sshd reload
+
+
+ec2-ansible-server setup:
+- ansible.sh
+- create ansadmin
+- visudo -> add to sudoers
+- vi /etc/ssh/sshd_config -> enable password
+- service sshd reload
+- on ansadmin profile create ssh keys: ssh-keygen
+as ansadmin:
+add to hosts file: sudo vi /etc/ansible/hosts -> add ansible ip with [ansible] and docker ip with [docker]
+copy ssh to docker and to itself keys: ssh-copy-id [ip]
+test connection: ansible all -m ping / ansible all -a uptime
+
+
+integrate ansible with jenkins:
+- add ansible-server to ssh
+- add docker-server to ssh
+- create job -> publish over ssh
+
+ec2-k8s-server setup:
+sudo -i
+awscli
+kubectl (add execution permission, mv to bin)
+eksctl (mv to bin)
+create iam role (eksctl role) -> this role to eks bootstrap
+
+create cluster (20min, cloud formation):
+eksctl create cluster --name=devopst \
+--region us-east-1 \
+--node-type t2.small
+
+integrate with ansible:
+on k8s:
+- create ansadmin
+- visudo -> add to sudoers
+- vi /etc/ssh/sshd_config -> enable password
+- service sshd reload
+on ansible:
+- add to hosts file: sudo vi /etc/ansible/hosts -> add k8s ip with [k8s]
+- copy ssh to k8s keys: ssh-copy-id [ip]
+- test connection: ansible all -m ping / ansible all -a uptime
+- manifest files and ansible playbook is set up in ansible.sh
+
+---
+
+ansible-playbook -i file
+
+on jenkins:
+new job deploy on kubernetes (connect to ansible and execute commands to run playbook)
+update playbook to run all 2 files
+create 2 job CI and CD
+
+eksctl delete cluster devopst --region us-east-1
