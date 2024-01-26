@@ -56,11 +56,8 @@ on ansible:
 
 ---
 
-ansible-playbook -i file
-
 on jenkins:
-new job deploy on kubernetes (connect to ansible and execute commands to run playbook)
-update playbook to run all 2 files
-create 2 job CI and CD
+new job -> build and upload to dockerhub (connect to ansible and execute commands to run playbook)
+new job -> deploy to kubernetes (after first job, execute ansible-playbook)
 
 eksctl delete cluster devopst --region us-east-1
