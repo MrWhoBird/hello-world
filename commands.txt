@@ -6,7 +6,7 @@ ec2-jenkins-server setup:
 
 ec2-docker-server setup:
 - docker.sh
-- create dockeradmin and ansadmin
+- create dockeradmin and ansadmin (to connect from ansible) (+passwd)
 - visudo -> add to sudoers
 - vi /etc/ssh/sshd_config -> enable password
 - service sshd reload
@@ -14,21 +14,23 @@ ec2-docker-server setup:
 
 ec2-ansible-server setup:
 - ansible.sh
-- create ansadmin
+- create ansadmin (+passwd)
 - visudo -> add to sudoers
 - vi /etc/ssh/sshd_config -> enable password
 - service sshd reload
 - on ansadmin profile create ssh keys: ssh-keygen
 as ansadmin:
 add to hosts file: sudo vi /etc/ansible/hosts -> add ansible ip with [ansible] and docker ip with [docker]
-copy ssh to docker and to itself keys: ssh-copy-id [ip]
+copy ssh to docker-server (to ansadmin) and to itself keys: ssh-copy-id [ip] (ssh key required by ansible)
 test connection: ansible all -m ping / ansible all -a uptime
 
 
 integrate ansible with jenkins:
-- add ansible-server to ssh
-- add docker-server to ssh
+- add ansible-server to ssh credentials in jenkins
+- add docker-server to ssh credentials in jenkins
 - create job -> publish over ssh
+
+%%%%
 
 ec2-k8s-server setup:
 sudo -i
@@ -61,3 +63,15 @@ new job -> build and upload to dockerhub (connect to ansible and execute command
 new job -> deploy to kubernetes (after first job, execute ansible-playbook)
 
 eksctl delete cluster devopst --region us-east-1
+
+- czy w skrypcie docke.sh chce dockerfile?
+
+
+- integracja ssh z dockerem niepotrzebna?
+- dockerimage w dockerze niepotrzebny i w ansiblu tez nie (przekazanie jenkinsem do ansibla)
+- dockerfile mozna wyslac z jenkinsa?
+- skrpty w repo niepotrzebne (albo je przetransferowac jenkinsem i nie tworzyc na starcie ansibla)
+- 2gi pipeline eksport do ansibla czy do k8s?
+- 2gi pipeline zintegrowac w jeden?
+- docker-deployment-regapp.yml po co?
+- join deploy and service yml into 1

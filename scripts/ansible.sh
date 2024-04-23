@@ -1,7 +1,6 @@
 #!/bin/bash
 sudo -i
 useradd ansadmin
-passwd ansadmin
 yum install ansible -y
 yum install docker -y
 systemctl enable docker
