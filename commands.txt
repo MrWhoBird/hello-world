@@ -1,3 +1,5 @@
+github -> jenkins -> ssh agent to ansible, send files to ansible -> 
+
 ec2-jenkins-server setup:
 - jenkins.sh
 - configure jenkins, git, maven tool
@@ -7,7 +9,7 @@ ec2-jenkins-server setup:
 ec2-docker-server setup:
 - docker.sh
 - create dockeradmin and ansadmin (to connect from ansible) (+passwd)
-- visudo -> add to sudoers
+- visudo -> add ansadmin to sudoers
 - vi /etc/ssh/sshd_config -> enable password
 - service sshd reload
 
@@ -28,21 +30,35 @@ test connection: ansible all -m ping / ansible all -a uptime
 integrate ansible with jenkins:
 - add ansible-server to ssh credentials in jenkins
 - add docker-server to ssh credentials in jenkins
-- create job -> publish over ssh
+- create job -> publish over ssh (github => jenkins -> transfer files to ansible server //opt/docker)
 
 %%%%
 
+docker build -t regapp:v1 .
+docker run -d --name regapp-server -p 8081:8080 regapp:v1
+
+ansible-playbook write to build the image
+log in to dockerhub
+push to dockerhub
+ansible-playbook /opt/docker/create-image-regapp.yml -> add to jenkins job
+
 ec2-k8s-server setup:
 sudo -i
-awscli
+awscli install
 kubectl (add execution permission, mv to bin)
 eksctl (mv to bin)
-create iam role (eksctl role) -> this role to eks bootstrap
+create iam role (eksctl role) -> attach this role to eks bootstrap
 
 create cluster (20min, cloud formation):
 eksctl create cluster --name=devopst \
 --region us-east-1 \
 --node-type t2.small
+
+delete cluster:
+eksctl delete cluster devopst --region us-east-1
+
+write deploy and service
+kubectl apply - f [files]
 
 integrate with ansible:
 on k8s:
@@ -62,15 +78,10 @@ on jenkins:
 new job -> build and upload to dockerhub (connect to ansible and execute commands to run playbook)
 new job -> deploy to kubernetes (after first job, execute ansible-playbook)
 
-eksctl delete cluster devopst --region us-east-1
 
-- czy w skrypcie docke.sh chce dockerfile?
-
-
+- czy potrzebuje /opt/docker na obu serwerach? albo czy docker server potrzebny?
+- czy potrzebny dockerhost deployment?
 - integracja ssh z dockerem niepotrzebna?
-- dockerimage w dockerze niepotrzebny i w ansiblu tez nie (przekazanie jenkinsem do ansibla)
-- dockerfile mozna wyslac z jenkinsa?
-- skrpty w repo niepotrzebne (albo je przetransferowac jenkinsem i nie tworzyc na starcie ansibla)
 - 2gi pipeline eksport do ansibla czy do k8s?
 - 2gi pipeline zintegrowac w jeden?
 - docker-deployment-regapp.yml po co?
