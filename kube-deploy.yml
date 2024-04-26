@@ -1,8 +1,0 @@
----
-- hosts: k8s
-  user: root
-  tasks:
-  - name: deploy regapp on k8s
-    command: kubectl apply -f ./regapp-deploy.yml
-  - name: create service for regapp
-    command: kubectl apply -f ./regapp-service.yml
