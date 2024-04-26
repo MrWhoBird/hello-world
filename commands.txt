@@ -6,14 +6,6 @@ ec2-jenkins-server setup:
 - install publish over ssh
 
 
-ec2-docker-server setup:
-- docker.sh
-- create dockeradmin and ansadmin (to connect from ansible) (+passwd)
-- visudo -> add ansadmin to sudoers
-- vi /etc/ssh/sshd_config -> enable password
-- service sshd reload
-
-
 ec2-ansible-server setup:
 - ansible.sh
 - create ansadmin (+passwd)
@@ -21,33 +13,15 @@ ec2-ansible-server setup:
 - vi /etc/ssh/sshd_config -> enable password
 - service sshd reload
 - on ansadmin profile create ssh keys: ssh-keygen
-as ansadmin:
-add to hosts file: sudo vi /etc/ansible/hosts -> add ansible ip with [ansible] and docker ip with [docker]
-copy ssh to docker-server (to ansadmin) and to itself keys: ssh-copy-id [ip] (ssh key required by ansible)
-test connection: ansible all -m ping / ansible all -a uptime
 
-
-integrate ansible with jenkins:
-- add ansible-server to ssh credentials in jenkins
-- add docker-server to ssh credentials in jenkins
-- create job -> publish over ssh (github => jenkins -> transfer files to ansible server //opt/docker)
-
-%%%%
-
-docker build -t regapp:v1 .
-docker run -d --name regapp-server -p 8081:8080 regapp:v1
-
-ansible-playbook write to build the image
-log in to dockerhub
-push to dockerhub
-ansible-playbook /opt/docker/create-image-regapp.yml -> add to jenkins job
 
 ec2-k8s-server setup:
-sudo -i
-awscli install
-kubectl (add execution permission, mv to bin)
-eksctl (mv to bin)
-create iam role (eksctl role) -> attach this role to eks bootstrap
+- k8s.sh
+- create iam role (eksctl role) -> attach this role to eks bootstrap
+- create ansadmin (+passwd)
+- visudo -> add to sudoers
+- vi /etc/ssh/sshd_config -> enable password
+- service sshd reload
 
 create cluster (20min, cloud formation):
 eksctl create cluster --name=devopst \
@@ -57,32 +31,16 @@ eksctl create cluster --name=devopst \
 delete cluster:
 eksctl delete cluster devopst --region us-east-1
 
-write deploy and service
-kubectl apply - f [files]
 
-integrate with ansible:
-on k8s:
-- create ansadmin
-- visudo -> add to sudoers
-- vi /etc/ssh/sshd_config -> enable password
-- service sshd reload
-on ansible:
-- add to hosts file: sudo vi /etc/ansible/hosts -> add k8s ip with [k8s]
-- copy ssh to k8s keys: ssh-copy-id [ip]
+integrate ansible with jenkins & k8s:
+as ansadmin:
+- add to ansible hosts file: sudo vi /etc/ansible/hosts -> add ansible ip with [ansible] and k8s ip with [k8s]
+- copy ssh to k8s-server (to ansadmin user) and to itself keys: ssh-copy-id [ip] (ssh key required by ansible)
 - test connection: ansible all -m ping / ansible all -a uptime
-- manifest files and ansible playbook is set up in ansible.sh
-
----
-
-on jenkins:
-new job -> build and upload to dockerhub (connect to ansible and execute commands to run playbook)
-new job -> deploy to kubernetes (after first job, execute ansible-playbook)
+- add ansible-server to ssh credentials in jenkins
 
 
-- czy potrzebuje /opt/docker na obu serwerach? albo czy docker server potrzebny?
-- czy potrzebny dockerhost deployment?
-- integracja ssh z dockerem niepotrzebna?
-- 2gi pipeline eksport do ansibla czy do k8s?
-- 2gi pipeline zintegrowac w jeden?
-- docker-deployment-regapp.yml po co?
-- join deploy and service yml into 1
+create job [rdy in jenkinsfile]:
+- publish over ssh (github -> jenkins -> transfer needed files to ansible server //opt/docker)
+- build the image and push it to dockerhub (log in to dockerhub)
+- use deploy & service files to create a k8s deployment (ansible playbook)
