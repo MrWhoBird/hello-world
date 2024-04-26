@@ -1,4 +1,4 @@
-github -> jenkins -> ssh agent to ansible, send files to ansible -> 
+github -> jenkins -> ssh agent to ansible, send files to ansible -> run playbook to push to dockerhub & deploy on docker 
 
 ec2-jenkins-server setup:
 - jenkins.sh
@@ -32,57 +32,4 @@ integrate ansible with jenkins:
 - add docker-server to ssh credentials in jenkins
 - create job -> publish over ssh (github => jenkins -> transfer files to ansible server //opt/docker)
 
-%%%%
-
-docker build -t regapp:v1 .
-docker run -d --name regapp-server -p 8081:8080 regapp:v1
-
-ansible-playbook write to build the image
-log in to dockerhub
-push to dockerhub
-ansible-playbook /opt/docker/create-image-regapp.yml -> add to jenkins job
-
-ec2-k8s-server setup:
-sudo -i
-awscli install
-kubectl (add execution permission, mv to bin)
-eksctl (mv to bin)
-create iam role (eksctl role) -> attach this role to eks bootstrap
-
-create cluster (20min, cloud formation):
-eksctl create cluster --name=devopst \
---region us-east-1 \
---node-type t2.small
-
-delete cluster:
-eksctl delete cluster devopst --region us-east-1
-
-write deploy and service
-kubectl apply - f [files]
-
-integrate with ansible:
-on k8s:
-- create ansadmin
-- visudo -> add to sudoers
-- vi /etc/ssh/sshd_config -> enable password
-- service sshd reload
-on ansible:
-- add to hosts file: sudo vi /etc/ansible/hosts -> add k8s ip with [k8s]
-- copy ssh to k8s keys: ssh-copy-id [ip]
-- test connection: ansible all -m ping / ansible all -a uptime
-- manifest files and ansible playbook is set up in ansible.sh
-
----
-
-on jenkins:
-new job -> build and upload to dockerhub (connect to ansible and execute commands to run playbook)
-new job -> deploy to kubernetes (after first job, execute ansible-playbook)
-
-
-- czy potrzebuje /opt/docker na obu serwerach? albo czy docker server potrzebny?
-- czy potrzebny dockerhost deployment?
-- integracja ssh z dockerem niepotrzebna?
-- 2gi pipeline eksport do ansibla czy do k8s?
-- 2gi pipeline zintegrowac w jeden?
-- docker-deployment-regapp.yml po co?
-- join deploy and service yml into 1
+ansible-playbook to push to dockerhub + run on docker-server [in jenkinsfile]
