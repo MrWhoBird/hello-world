@@ -1,4 +1,4 @@
-github -> jenkins -> ssh agent to ansible, send files to ansible -> run playbook to push to dockerhub & deploy on docker 
+github -> jenkins -> ssh agent to ansible, send files to ansible -> run playbook to push to dockerhub & deploy on docker-server 
 
 ec2-jenkins-server setup:
 - jenkins.sh
@@ -8,7 +8,7 @@ ec2-jenkins-server setup:
 
 ec2-docker-server setup:
 - docker.sh
-- create dockeradmin and ansadmin (to connect from ansible) (+passwd)
+- create dockeradmin and ansadmin (ansadmin to connect from ansible-server as ansadmin user) (+passwd)
 - visudo -> add ansadmin to sudoers
 - vi /etc/ssh/sshd_config -> enable password
 - service sshd reload
@@ -29,7 +29,5 @@ test connection: ansible all -m ping / ansible all -a uptime
 
 integrate ansible with jenkins:
 - add ansible-server to ssh credentials in jenkins
-- add docker-server to ssh credentials in jenkins
 - create job -> publish over ssh (github => jenkins -> transfer files to ansible server //opt/docker)
-
-ansible-playbook to push to dockerhub + run on docker-server [in jenkinsfile]
+- ansible-playbook to push to dockerhub + run on docker-server [in jenkinsfile]

@@ -1,5 +1,5 @@
 ---
-- hosts: dockerhost
+- hosts: docker
   tasks:
   - name: stop existing container
     command: docker stop regapp-server
