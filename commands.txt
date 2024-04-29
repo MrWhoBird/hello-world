@@ -1,4 +1,6 @@
 github -> jenkins -> ssh agent to ansible, send files to ansible -> 
+  a. from ansible run a container on docker-server (docker-flow)
+  b. from ansible run a k8s cluster (master)
 
 ec2-jenkins-server setup:
 - jenkins.sh
