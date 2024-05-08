@@ -1,6 +1,4 @@
-github -> jenkins -> ssh agent to ansible, send files to ansible -> 
-  a. from ansible run a container on docker-server (docker-flow)
-  b. from ansible run a k8s cluster (master)
+github -> jenkins -> ssh agent to ansible, send files to ansible -> from ansible run a k8s cluster (master)
 
 ec2-jenkins-server setup:
 - jenkins.sh
@@ -12,7 +10,7 @@ ec2-ansible-server setup:
 - ansible.sh
 - create ansadmin (+passwd)
 - visudo -> add to sudoers
-- vi /etc/ssh/sshd_config -> enable password
+- vi /etc/ssh/sshd_config -> enable password (connection from jenkins)
 - service sshd reload
 - on ansadmin profile create ssh keys: ssh-keygen
 
@@ -22,7 +20,7 @@ ec2-k8s-server setup:
 - create iam role (eksctl role) -> attach this role to eks bootstrap
 - create ansadmin (+passwd)
 - visudo -> add to sudoers
-- vi /etc/ssh/sshd_config -> enable password
+- vi /etc/ssh/sshd_config -> enable password (connection from jenkins)
 - service sshd reload
 
 create cluster (20min, cloud formation):
