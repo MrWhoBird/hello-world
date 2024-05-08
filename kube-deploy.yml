@@ -1,6 +1,5 @@
 ---
 - hosts: k8s
-  user: root
   tasks:
   - name: deploy regapp on k8s
     command: kubectl apply -f /opt/docker/regapp-deploy.yml
